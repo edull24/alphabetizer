@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Alphabetizer</title>
+	<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+	<style>
+		html {
+			box-sizing: border-box;
+			font-size: 62.5%;
+			height: 100%;
+		}
+
+		body {
+			font-size: 1.6rem;
+			min-height: 100%;
+			margin: 0;
+		}
+
+		*,
+		*::before,
+		*::after {
+			box-sizing: inherit;
+		}
+
+		.app {
+			display: flex;
+			flex-direction: column;
+			padding: 1rem 0 8.3rem 0;
+		}
+
+		.app__main {
+			flex: 1 0 auto;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+
+		.app__footer {
+			flex: none;
+			text-align: center;
+			width: 100%;
+			position: fixed;
+			bottom: 0;
+			padding: 1.5rem;
+			background-color: black;
+		}
+
+		.btn {
+			border: 0;
+			background-color: gold;
+			padding: 1rem 2rem;
+			font-size: 2rem;
+		}
+
+		.list {
+			list-style: none;
+			margin: 0;
+			padding: 0;
+			font-size: 3rem;
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+		}
+
+		.list:empty::before {
+			content: 'Click "Add Word" below to get started!';
+			display: block;
+		}
+
+		.list__item {
+			padding: 2rem;
+			min-width: 30rem;
+			box-shadow: 0 0 5px 2px rgba(0,0,0,.2);
+		}
+
+		.list__item:not(:last-child) {
+			margin-bottom: 1.5rem;
+		}
+
+		.check-order-btn {
+			margin-left: 1rem;
+		}
+
+		.modal {
+			position: fixed;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			padding: 5px;
+			display: none;
+			background-color: rgba(0,0,0,.85);
+		}
+
+		.modal--is-open {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+
+		.modal__add-item {
+			margin: 0;
+			padding: 1rem;
+			font-size: 4rem;
+		}
+
+		.sortable-chosen {
+			background-color: white;
+		}
+	</style>
+</head>
+<body class="app">
+	<main class="app__main">
+		<ul id="list" class="list"></ul>
+	</main>
+
+	<footer class="app__footer">
+		<button id="addWordBtn" type="button" class="btn add-word-btn">Add Word</button>
+		<button id="checkOrderBtn" type="button" class="btn check-order-btn">Check Order</button>
+	</footer>
+
+	<div id="modal" class="modal">
+		<input type="text" class="modal__add-item">
+	</div>
+
+	<script>
+		const words = [];
+
+		const list = document.getElementById('list');
+		const checkOrderBtn = document.getElementById('checkOrderBtn');
+		const addWordBtn = document.getElementById('addWordBtn');
+		const modal = document.getElementById('modal');
+		const addItem = modal.querySelector('.modal__add-item');
+
+		const isCorrect = function() {
+
+			const domOrder = document.querySelectorAll('.list__item');
+			const domVals = [];
+
+			domOrder.forEach(function(el) {
+
+				domVals.push(el.textContent);
+
+			});
+			
+			return words.sort().join('') === domVals.join('');
+			
+		};
+
+		checkOrderBtn.addEventListener('click', function() {
+
+			if (isCorrect()) {
+
+				alert('correct');
+
+			} else {
+
+				alert('wrong');
+
+			}
+
+		});
+
+		addWordBtn.addEventListener('click', function() {
+
+			modal.classList.toggle('modal--is-open');
+			addItem.focus();
+
+		});
+
+		addItem.addEventListener('keyup', function (e) {
+
+			const val = this.value.trim();
+
+			if (e.key === 'Enter') {
+
+				if (val) {
+
+					words.push(val);
+					list.insertAdjacentHTML('beforeend', '<li class="list__item">' + val + '</li>');
+					modal.classList.toggle('modal--is-open');
+
+				}
+
+				this.value = '';
+
+			}
+
+		});
+
+
+		Sortable.create(list, {
+			direction: 'vertical',
+			draggable: '.list__item',
+			// invertSwap: true
+		});
+	</script>
+</body>
+</html>
